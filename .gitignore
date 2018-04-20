@@ -16,8 +16,15 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+/*.log
+/*.tmp
 
 /node_modules
 /yarn-error.log
 
 .byebug_history
+dump.rdb
+
+# Ephemeral application files
+/public/uploads/*
+
