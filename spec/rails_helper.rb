@@ -1,11 +1,19 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
+
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'spec_helper'
+require 'action_view'
+require 'devise'
+require 'devise/version'
+require 'rspec/matchers'
+require 'active_fedora/cleaner'
+require 'capybara/rspec'
+require 'capybara/rails'
+require 'database_cleaner'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -19,12 +27,19 @@ require 'rspec/rails'
 # of increasing the boot-up time by auto-requiring all files in the support
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
-#
-# Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
+
+# See https://github.com/thoughtbot/shoulda-matchers#rspec
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -54,4 +69,37 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  
+  config.before :suite do
+    ActiveFedora::Cleaner.clean!
+  end
+
+  config.before :each do
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.start
+  end
+
+  config.after do
+    DatabaseCleaner.clean
+  end
+
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Capybara::RSpecMatchers, type: :input
+
+  config.include Warden::Test::Helpers, type: :feature
+  config.after(:each, type: :feature) { Warden.test_reset! }
+
+  # Gets around a bug in RSpec where helper methods that are defined in views aren't
+  # getting scoped correctly and RSpec returns "does not implement" errors. So we
+  # can disable verify_partial_doubles if a particular test is giving us problems.
+  # Ex:
+  #   describe "problem test", verify_partial_doubles: false do
+  #     ...
+  #   end
+  config.before :each do |example|
+    config.mock_with :rspec do |mocks|
+      mocks.verify_partial_doubles = example.metadata.fetch(:verify_partial_doubles, true)
+    end
+  end
+  
 end
