@@ -30,6 +30,25 @@ RSpec.feature 'Create a Work', js: false do
       login_as user
     end
 
+    scenario 'Submit a new work with metadata' do
+      visit '/concern/works/new'
+      fill_in 'Title', with: 'Journey to Skull Island'
+      fill_in 'Creator', with: 'Quest, Jane'
+      fill_in 'Keyword', with: 'Adventure'
+      select('In Copyright', from: 'Rights statement')
+      choose('open')
+      check('agreement')
+      click_link "Files" # switch tab
+      within('span#addfiles') do
+        attach_file('files[]', "#{fixture_path}/fake_text1.pdf", visible: false)
+      end
+      click_on('Save')
+      expect(page).to have_content 'Your files are being processed'
+      expect(page).to have_content 'Journey to Skull Island'
+      expect(page).to have_content 'Quest, Jane'
+      expect(page).to have_content 'Adventure'
+    end
+
     scenario do
       visit '/dashboard'
       click_link "Works"
