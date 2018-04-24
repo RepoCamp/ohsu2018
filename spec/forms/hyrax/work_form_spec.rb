@@ -3,7 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe Hyrax::WorkForm do
-  it "has tests" do
-    skip "Add your tests here"
+  subject       { form }
+  let(:work)    { Work.new }
+  let(:ability) { Ability.new(nil) }
+  let(:request) { nil }
+  let(:form)    { described_class.new(work, ability, request) }
+
+  it 'has the expected terms' do
+    expect(form.terms).to include(:title)
+    expect(form.terms).to include(:year)
   end
 end
