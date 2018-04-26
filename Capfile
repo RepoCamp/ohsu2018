@@ -4,6 +4,12 @@ require "capistrano/setup"
 # Include default deployment tasks
 require "capistrano/deploy"
 
+# Use bundler to install gem requirements
+require 'capistrano/bundler'
+require 'capistrano/rails'
+require 'capistrano/sidekiq'
+require 'capistrano/passenger'
+
 # Load the SCM plugin appropriate to your project:
 #
 # require "capistrano/scm/hg"
