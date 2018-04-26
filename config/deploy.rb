@@ -6,7 +6,7 @@ lock "~> 3.10.2"
 set :passenger_restart_wait, 60
 
 set :application, "ohsu2018"
-set :repo_url, "https://github.com/repo-camp/ohsu2018.git"
+set :repo_url, "https://github.com/repocamp/ohsu2018.git"
 
 set :deploy_to, '/opt/ohsu2018'
 
