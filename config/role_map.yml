@@ -20,4 +20,7 @@ test:
     - leland_himself@example.com
 
 production:
-  # Add roles for users here.
+  admin:
+    - mark@curationexperts.com
+    - tom@curationexperts.com
+    - mjgiarlo@stanford.edu
